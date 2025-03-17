@@ -1,0 +1,24 @@
+{
+  "originHash" : "d9ac94139c06768d2a9b316dae49a501b997ab26dbd4ecf4351951af6644632e",
+  "pins" : [
+    {
+      "identity" : "ios_sdk",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/adjust/ios_sdk.git",
+      "state" : {
+        "revision" : "e163732d55c3c0eb749f22418b6e4855839696c3",
+        "version" : "4.38.4"
+      }
+    },
+    {
+      "identity" : "taanalytics",
+      "kind" : "remoteSourceControl",
+      "location" : "git@github.com:TechArtists/TAAnalytics.git",
+      "state" : {
+        "revision" : "a344af269d4b111fabd4d0de8914965458ee4df4",
+        "version" : "1.0.2"
+      }
+    }
+  ],
+  "version" : 3
+}
