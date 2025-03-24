@@ -28,13 +28,13 @@ SOFTWARE.
 import PackageDescription
 
 let package = Package(
-    name: "TAAnalyticsAdjustConsumer",
+    name: "AdjustAnalyticsConsumer",
     platforms: [.iOS(.v13), .macOS(.v10_13)],
     products: [
         // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
-            name: "TAAnalyticsAdjustConsumer",
-            targets: ["TAAnalyticsAdjustConsumer"])
+            name: "AdjustAnalyticsConsumer",
+            targets: ["AdjustAnalyticsConsumer"])
     ],
     dependencies: [
         .package(
@@ -50,15 +50,15 @@ let package = Package(
         // Targets are the basic building blocks of a package, defining a module or a test suite.
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
-            name: "TAAnalyticsAdjustConsumer",
+            name: "AdjustAnalyticsConsumer",
             dependencies: [
                 .product(name: "Adjust", package: "ios_sdk"),
                 .product(name: "TAAnalytics", package: "TAAnalytics")
             ]
         ),
         .testTarget(
-            name: "TAAnalyticsAdjustConsumerTests",
-            dependencies: ["TAAnalyticsAdjustConsumer"]
+            name: "AdjustAnalyticsConsumerTests",
+            dependencies: ["AdjustAnalyticsConsumer"]
         )
     ]
 )
