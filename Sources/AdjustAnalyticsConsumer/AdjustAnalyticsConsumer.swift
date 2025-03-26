@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-//  TAAdjustAnalyticsConsumer.swift
+//  AdjustAnalyticsConsumer.swift
 //  Created by Adi on 10/24/22.
 //
 //  Copyright (c) 2022 Tech Artists Agency SRL
@@ -35,26 +35,27 @@ import Adjust
 /// Sends messages to Adjust about analytics events & user properties.
 public class AdjustAnalyticsConsumer: AnalyticsConsumer, AnalyticsConsumerWithWriteOnlyUserID {
 
-    public typealias T = AdjustAnalyticsConsumer
-
-    private let enabledInstallTypes: [TAAnalyticsConfig.InstallType]
-    private let appToken: String
+    private let sdkKey: String
     private let environment: String
+    private let enabledInstallTypes: [TAAnalyticsConfig.InstallType]
+    private let isRedacted: Bool
 
     // MARK: AnalyticsConsumer
 
     /// - Parameters:
-    ///   - appToken: Your Adjust app token.
+    ///   - sdkKey: Your Adjust SDK key.
     ///   - environment: Adjust environment (e.g., "production" or "sandbox").
     ///   - enabledInstallTypes: Install types for which the consumer is enabled.
-    init(
-        appToken: String,
+    public init(
+        sdkKey: String,
         environment: String,
-        enabledInstallTypes: [TAAnalyticsConfig.InstallType]
+        enabledInstallTypes: [TAAnalyticsConfig.InstallType] = TAAnalyticsConfig.InstallType.allCases,
+        isRedacted: Bool = true
     ) {
-        self.appToken = appToken
+        self.sdkKey = sdkKey
         self.environment = environment
         self.enabledInstallTypes = enabledInstallTypes
+        self.isRedacted = isRedacted
     }
 
     public func startFor(
@@ -67,16 +68,13 @@ public class AdjustAnalyticsConsumer: AnalyticsConsumer, AnalyticsConsumerWithWr
         }
 
         let adjustEnvironment = environment.lowercased() == "production" ? ADJEnvironmentProduction : ADJEnvironmentSandbox
-        let adjustConfig = ADJConfig(appToken: appToken, environment: adjustEnvironment)
+        let adjustConfig = ADJConfig(appToken: sdkKey, environment: adjustEnvironment)
 
-        // Optionally set log level or other configurations here
         Adjust.appDidLaunch(adjustConfig)
     }
 
-    public func track(trimmedEvent: TrimmedEvent, params: [String: AnalyticsBaseParameterValue]?) {
-        let eventToken = trimmedEvent.event
-
-        guard let adjustEvent = ADJEvent(eventToken: eventToken.rawValue) else {
+    public func track(trimmedEvent: EventAnalyticsModelTrimmed, params: [String: any AnalyticsBaseParameterValue]?) {
+        guard let adjustEvent = ADJEvent(eventToken: trimmedEvent.rawValue) else {
             return
         }
 
@@ -89,27 +87,26 @@ public class AdjustAnalyticsConsumer: AnalyticsConsumer, AnalyticsConsumerWithWr
         Adjust.trackEvent(adjustEvent)
     }
 
-    public func set(trimmedUserProperty: TrimmedUserProperty, to: String?) {
-        let userPropertyKey = trimmedUserProperty.userProperty.rawValue
+    public func set(trimmedUserProperty: UserPropertyAnalyticsModelTrimmed, to: String?) {
+        let key = trimmedUserProperty.rawValue
 
         if let value = to {
-            Adjust.addSessionCallbackParameter(userPropertyKey, value: value)
+            Adjust.addSessionCallbackParameter(key, value: value)
         } else {
-            Adjust.removeSessionCallbackParameter(userPropertyKey)
+            Adjust.removeSessionCallbackParameter(key)
         }
     }
 
-    public func trim(event: AnalyticsEvent) -> TrimmedEvent {
-        return TrimmedEvent(event.rawValue)
+    public func trim(event: EventAnalyticsModel) -> EventAnalyticsModelTrimmed {
+        EventAnalyticsModelTrimmed(event.rawValue.ta_trim(toLength: 40, debugType: "event"))
     }
 
-    public func trim(userProperty: AnalyticsUserProperty) -> TrimmedUserProperty {
-        let trimmedKey = userProperty.rawValue.ob_trim(type: "user property", toLength: 24)
-        return TrimmedUserProperty(trimmedKey)
+    public func trim(userProperty: UserPropertyAnalyticsModel) -> UserPropertyAnalyticsModelTrimmed {
+        UserPropertyAnalyticsModelTrimmed(userProperty.rawValue.ta_trim(toLength: 24, debugType: "user property"))
     }
 
-    public var wrappedValue: Self {
-        return self
+    public var wrappedValue: Adjust.Type {
+        Adjust.self
     }
 
     // MARK: AnalyticsConsumerWithWriteOnlyUserID
