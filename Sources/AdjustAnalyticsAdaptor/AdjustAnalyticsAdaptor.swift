@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-//  AdjustAnalyticsConsumer.swift
+//  AdjustAnalyticsAdaptor.swift
 //  Created by Adi on 10/24/22.
 //
 //  Copyright (c) 2022 Tech Artists Agency SRL
@@ -33,14 +33,14 @@ import TAAnalytics
 import Adjust
 
 /// Sends messages to Adjust about analytics events & user properties.
-public class AdjustAnalyticsConsumer: AnalyticsConsumer, AnalyticsConsumerWithWriteOnlyUserID {
+public class AdjustAnalyticsAdaptor: AnalyticsAdaptor, AnalyticsAdaptorWithWriteOnlyUserID {
 
     private let sdkKey: String
     private let environment: String
     private let enabledInstallTypes: [TAAnalyticsConfig.InstallType]
     private let isRedacted: Bool
 
-    // MARK: AnalyticsConsumer
+    // MARK: AnalyticsAdaptor
 
     /// - Parameters:
     ///   - sdkKey: Your Adjust SDK key.
@@ -109,7 +109,7 @@ public class AdjustAnalyticsConsumer: AnalyticsConsumer, AnalyticsConsumerWithWr
         Adjust.self
     }
 
-    // MARK: AnalyticsConsumerWithWriteOnlyUserID
+    // MARK: AnalyticsAdaptorWithWriteOnlyUserID
 
     public func set(userID: String?) {
         if let userID = userID {
